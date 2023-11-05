@@ -1,0 +1,100 @@
+{
+  "name": "Nguyen Huy Hoang",
+  "email": "hoanggb11@gmail.com",
+  "is_allocated_client": true,
+  "phone": "0987654321",
+  "zalo_phone": "0987654321",
+  "zalo_name": "Nguyen Huy Hoang",
+  "telegram_username": "hoanggb11",
+  "count_account": 14,
+  "last_trade_at": "24-09-2023",
+  "last_trade_client_account": "102773124",
+  "volumn_lots": 123.45,
+  "reward_usd": 123.45,
+  "trade_accounts": [
+      {
+          "client_account": "123456",
+          "last_trade_at": "24-09-2023",
+          "volumn_lots": 123.45,
+          "reward_usd": 123.45,
+          "trade_history": [
+              {
+                  "date": "24-09-2023",
+                  "volumn_lots": 123.45,
+                  "reward_usd": 123.45
+              },
+              {
+                  "date": "24-09-2023",
+                  "volumn_lots": 123.45,
+                  "reward_usd": 123.45
+              },
+              {
+                  "date": "24-09-2023",
+                  "volumn_lots": 123.45,
+                  "reward_usd": 123.45
+              },
+              {
+                  "date": "24-09-2023",
+                  "volumn_lots": 123.45,
+                  "reward_usd": 123.45
+              }
+          ]
+      },
+      {
+          "client_account": "123456",
+          "last_trade_at": "24-09-2023",
+          "volumn_lots": 123.45,
+          "reward_usd": 123.45,
+          "trade_history": [
+              {
+                  "date": "24-09-2023",
+                  "volumn_lots": 123.45,
+                  "reward_usd": 123.45
+              },
+              {
+                  "date": "24-09-2023",
+                  "volumn_lots": 123.45,
+                  "reward_usd": 123.45
+              },
+              {
+                  "date": "24-09-2023",
+                  "volumn_lots": 123.45,
+                  "reward_usd": 123.45
+              },
+              {
+                  "date": "24-09-2023",
+                  "volumn_lots": 123.45,
+                  "reward_usd": 123.45
+              }
+          ]
+      },
+      {
+          "client_account": "123456",
+          "last_trade_at": "24-09-2023",
+          "volumn_lots": 123.45,
+          "reward_usd": 123.45,
+          "trade_history": [
+              {
+                  "date": "24-09-2023",
+                  "volumn_lots": 123.45,
+                  "reward_usd": 123.45
+              },
+              {
+                  "date": "24-09-2023",
+                  "volumn_lots": 123.45,
+                  "reward_usd": 123.45
+              },
+              {
+                  "date": "24-09-2023",
+                  "volumn_lots": 123.45,
+                  "reward_usd": 123.45
+              },
+              {
+                  "date": "24-09-2023",
+                  "volumn_lots": 123.45,
+                  "reward_usd": 123.45
+              }
+          ]
+      }
+  ]
+}

@@ -1,0 +1,175 @@
+version: '3.9'
+services:
+  mongodb-primary:
+    image: bitnami/mongodb:latest
+    hostname: mongodb-primary
+    networks:
+      - mongo-cluster
+      - dni-cluster
+    volumes:
+      - mongo-dni-data:/bitnami
+    env_file:
+      - .env
+    environment:
+      - MONGODB_REPLICA_SET_MODE=primary
+      - MONGODB_ADVERTISED_HOSTNAME=mongodb-primary
+      - MONGODB_ROOT_USER=${MONGO_ROOT_USERNAME}
+      - MONGODB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+      - MONGODB_USERNAME=${MONGO_PRIMARY_USERNAME}
+      - MONGODB_PASSWORD=${MONGO_PRIMARY_PASSWORD}
+      - MONGODB_DATABASE=${MONGO_DATABASE}
+      - MONGODB_REPLICA_SET_KEY=replicasetkey123
+    ports:
+      - ${MONGO_PRIMARY_PORT}:27017
+
+  mongodb-secondary:
+    image: bitnami/mongodb:latest
+    hostname: mongodb-secondary
+    networks:
+      - mongo-cluster
+      - dni-cluster
+    env_file:
+      - .env
+    depends_on:
+      - mongodb-primary
+    environment:
+      - MONGODB_REPLICA_SET_MODE=secondary
+      - MONGODB_ADVERTISED_HOSTNAME=mongodb-secondary
+      - MONGODB_PRIMARY_HOST=mongodb-primary
+      - MONGODB_PRIMARY_PORT_NUMBER=${MONGO_PRIMARY_PORT}
+      - MONGODB_PRIMARY_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+      - MONGODB_REPLICA_SET_KEY=replicasetkey123
+
+  redis:
+    image: bitnami/redis:latest
+    hostname: redis
+    container_name: redis
+    networks:
+      - dni-cluster
+    volumes:
+      - redis-dni-data:/bitnami/redis/data
+    environment:
+      - REDIS_IO_THREADS=4
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    ports:
+      - ${REDIS_PORT}:6379
+
+  rabbitmq:
+    image: bitnami/rabbitmq:latest
+    hostname: rabbitmq
+    container_name: rabbitmq
+    env_file:
+      - .env
+    networks:
+      - dni-cluster
+    environment:
+      - RABBITMQ_VHOST=${RMQ_VHOST}
+      - RABBITMQ_USERNAME=${RMQ_USERNAME}
+      - RABBITMQ_PASSWORD=${RMQ_PASSWORD}
+    volumes:
+      - rabbitmq-dni-data:/bitnami/rabbitmq/mnesia
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+
+  dni-cms-service:
+    container_name: dni-cms-service
+    hostname: dni-cms-service
+    image: dniinvest/dni_cms_service
+    networks:
+      - dni-cluster
+    depends_on:
+      - mongodb-primary
+      - mongodb-secondary
+      - redis
+      - rabbitmq
+    env_file:
+      - .env
+    command: > 
+      bash -c '
+        timedatectl set-timezone Asia/Ho_Chi_Minh
+      '
+    volumes:
+      - .env:/usr/src/app/.env
+      - /usr/src/app/node_modules
+    ports:
+      - ${DNI_PORT}:${DNI_PORT}
+
+  dni-master-service:
+    container_name: dni-master-service
+    hostname: dni-master-service
+    image: dniinvest/dni_master_service
+    depends_on:
+      - mongodb-primary
+      - mongodb-secondary
+      - redis
+      - rabbitmq
+    networks:
+      - dni-cluster
+    env_file:
+      - ./.env.master
+    volumes:
+      - ./.env.master:/usr/src/app/.env
+      - /usr/src/app/node_modules
+    ports:
+      - 5100:5100
+
+  dni-master-web:
+    container_name: dni-master-web
+    hostname: dni-master-web
+    image: dniinvest/dni_master_web
+    networks:
+      - dni-cluster
+    ports:
+      - 3100:80
+    environment:
+      - SKIP_PREFLIGHT_CHECK=true
+      - REACT_APP_SKIP_PREFLIGHT_CHECK=true
+      - CHOKIDAR_USEPOLLING=true
+      - REACT_APP_ENVIROMENT=Production
+      - REACT_APP_API_URL=https://master-api.dniinvest.com/
+      - REACT_APP_API_CDN=https://cdn-v2.didongviet.vn/
+      - REACT_APP_URL_FE=https://master.dniinvest.com/
+
+  dni-cms-web:
+    container_name: dni-cms-web
+    hostname: dni-cms-web
+    image: dniinvest/dni_cms_web
+    networks:
+      - dni-cluster
+    ports:
+      - 3001:80
+    environment:
+      - SKIP_PREFLIGHT_CHECK=true
+      - REACT_APP_SKIP_PREFLIGHT_CHECK=true
+      - CHOKIDAR_USEPOLLING=true
+      - REACT_APP_ENVIROMENT=Production
+      - REACT_APP_API_URL=https://cms-api.dniinvest.com/
+      - REACT_APP_URL_FE=https://cms-api.dniinvest.com/
+
+  dni-web:
+    container_name: dni-web
+    hostname: dni-web
+    image: dniinvest/dni_web
+    networks:
+      - dni-cluster
+    ports:
+      - 3000:80
+    environment:
+      - SKIP_PREFLIGHT_CHECK=true
+      - REACT_APP_SKIP_PREFLIGHT_CHECK=true
+      - CHOKIDAR_USEPOLLING=true
+      - REACT_APP_ENVIROMENT=Production
+      - REACT_APP_API_URL=https://cms-api.dniinvest.com/
+      - REACT_APP_URL_FE=https://cms-api.dniinvest.com/
+
+volumes:
+  mongo-dni-data:
+    driver: local
+  redis-dni-data:
+    driver: local
+  rabbitmq-dni-data:
+    driver: local
+networks:
+  mongo-cluster: {}
+  dni-cluster: {}
